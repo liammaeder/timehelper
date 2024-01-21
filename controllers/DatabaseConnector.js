@@ -41,7 +41,7 @@ class DatabaseConnector {
             if (error) {
                 callback(error, null);
             } else {
-                callback(null, results);
+                callback(null, results[0].result);
             }
         });
     }

@@ -20,7 +20,7 @@ app.use('/races', racesRoute);
 app.use('/racers', racersRoute);
 app.use('/users', usersRoute);
 
-const port = process.env.NODE_PORT || 8080;
+const port = process.env.NODE_PORT || 8000;
 
 app.listen(port, () => {
    console.log(`Node.js HTTP server is running on port ${port}`);

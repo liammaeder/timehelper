@@ -1,35 +1,28 @@
-const express       = require('express');
-const router        = express.Router();
-const dbConn        = require('../../controllers/DatabaseConnector');
-const db            = new dbConn;
+const express   = require('express');
+const router    = express.Router();
+const dbConn    = require('../../controllers/DatabaseConnector');
+const db        = new dbConn;
+const tableName = 'race';
 
 router.use(express.json());
 
 router.post('/', (req, res) => {
+    res.status(200);
     res.json({ data: 'Connection to races success' });
 });
 
 router.post('/createRace', async (req, res) => {
     const jsonData = JSON.parse(req.body);
     const values = jsonData.values;
-    const sql = `
-       INSERT INTO race SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')}`;
 
     try {
-        await db.connect();
-        await db.select(sql, jsonData, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({ message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Race created successfully",
-                    result: result
-                });
-            }
+        await db.create(tableName, values, (error, result) => {
+            const response = handleCallback(error, result);
+            res.status(response.status);
+            res.json(response.json);
         });
     } catch (error) {
+        res.status(500);
         res.json({"Error": error.message});
     }
 });
@@ -80,15 +73,9 @@ router.post('/getRace', async (req, res) => {
 
         try {
             db.query(sql, (error, result) => {
-                if (error) {
-                    console.log(error);
-                    res.status(500);
-                    res.json({message: error});
-                    return;
-                }
-
-                res.status(200);
-                res.json(result);
+                const response = handleCallback(error, result);
+                res.status(response.status);
+                res.json(response.json);
             });
         } catch (error) {
             res.status(500);
@@ -102,129 +89,67 @@ router.post('/getRaces', async (req, res) => {
     const condition = jsonData.condition;
     const limit = jsonData.limit;
     const offset = jsonData.offset;
-    const sql = `
-        SELECT * FROM race 
-        WHERE ${Object.entries(condition).map(([key, value]) => `${value}`).join(' AND ')}
-        LIMIT ${limit} OFFSET ${offset}`;
 
     try {
-        await db.connect();
-        await db.query(sql, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Races retrieved successfully",
-                    result: result
-                });
-            }
+        await db.select(tableName, condition, limit, offset, (error, result) => {
+            const response = handleCallback(error, result);
+            res.status(response.status);
+            res.json(response.json);
         });
     } catch (error) {
+        res.status(500);
         res.json({"Error": error.message});
     }
 });
 
-router.post('/updateRace', async (req, res) => {
+router.post('/updateRaces', async (req, res) => {
     const jsonData = JSON.parse(req.body);
-    const condition = jsonData.condition;
+    const conditions = jsonData.conditions;
     const values = jsonData.values;
-    const sql = `
-            UPDATE race SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')} 
-            WHERE ${Object.entries(condition).map(([key, value]) => `${key} = '${value}'`).join(' AND ')}
-            `;
 
     try {
-        await db.connect();
-        await db.query(sql, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Race updated successfully",
-                    result: result
-                });
-            }
+        await db.update(tableName, values, conditions, (error, result) => {
+            const response = handleCallback(error, result);
+            res.status(response.status);
+            res.json(response.json);
         });
     } catch (error) {
+        res.status(500);
         res.json({"Error": error.message});
     }
 });
 
-router.post('/updateRace', async (req, res) => {
+router.post('/deleteRaces', async (req, res) => {
     const jsonData = JSON.parse(req.body);
-    const idArray = jsonData.idArray;
-    const values = jsonData.values;
-    const sql = `UPDATE race SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')} WHERE id IN (${idArray.join(', ')})}`;
+    const conditions = jsonData.conditions;
 
     try {
-        await db.connect();
-        await db.query(sql, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Races updated successfully",
-                    result: result
-                });
-            }
+        await db.delete(tableName, conditions, (error, result) => {
+            const response = handleCallback(error, result);
+            res.status(response.status);
+            res.json(response.json);
         });
     } catch (error) {
+        res.status(500);
         res.json({"Error": error.message});
     }
 });
 
-router.delete('/deleteRace', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
-    const id = jsonData.id;
-    const sql = `DELETE FROM race WHERE id = ${id}`;
+function handleCallback(error, result) {
+    let response = {};
 
-    try {
-        await db.connect();
-        await db.query(sql, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Race deleted successfully",
-                    result: result
-                });
-            }
-        });
-    } catch (error) {
-        res.json({"Error": error.message});
+    if (error) {
+        response.status = 500;
+        response.json = {message: error};
+    } else {
+        response.status = 200;
+        response.json = {
+            message: "Races updated successfully",
+            result: result
+        };
     }
-});
 
-router.delete('/deleteRaces', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
-    const idArray = jsonData.idArray;
-    const sql = `DELETE FROM race WHERE id IN (${idArray.join(', ')})`;
-
-    try {
-        await db.connect();
-        await db.query(sql, (error, result) => {
-            if (error) {
-                res.status(500);
-                res.json({message: error});
-            } else {
-                res.status(200);
-                res.json({
-                    message: "Races deleted successfully",
-                    result: result
-                });
-            }
-        });
-    } catch (error) {
-        res.json({"Error": error.message});
-    }
-});
+    return response;
+}
 
 module.exports = router;

@@ -32,7 +32,7 @@ router.post('/getRace', async (req, res) => {
     const id = jsonData.id;
 
     if (id <= 0) {
-        res.status(200);
+        res.status(500);
         res.json({message: "no data for Id, -1"});
     } else {
         const sql = `
@@ -75,7 +75,7 @@ router.post('/getRace', async (req, res) => {
             db.query(sql, (error, result) => {
                 const response = handleCallback(error, result);
                 res.status(response.status);
-                res.json(response.json);
+                res.json(JSON.parse(response.json[0].result));
             });
         } catch (error) {
             res.status(500);
@@ -85,7 +85,7 @@ router.post('/getRace', async (req, res) => {
 });
 
 router.post('/getRaces', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
+    const jsonData = req.body;
     const condition = jsonData.condition;
     const limit = jsonData.limit;
     const offset = jsonData.offset;
@@ -93,17 +93,15 @@ router.post('/getRaces', async (req, res) => {
     try {
         await db.select(tableName, condition, limit, offset, (error, result) => {
             const response = handleCallback(error, result);
-            res.status(response.status);
-            res.json(response.json);
+            res.status(response.status).json(response.json);
         });
     } catch (error) {
-        res.status(500);
-        res.json({"Error": error.message});
+        res.status(500).json({"Error": error.message});
     }
 });
 
 router.post('/updateRaces', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
+    const jsonData = req.body;
     const conditions = jsonData.conditions;
     const values = jsonData.values;
 
@@ -120,7 +118,7 @@ router.post('/updateRaces', async (req, res) => {
 });
 
 router.post('/deleteRaces', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
+    const jsonData = req.body;
     const conditions = jsonData.conditions;
 
     try {
@@ -143,10 +141,7 @@ function handleCallback(error, result) {
         response.json = {message: error};
     } else {
         response.status = 200;
-        response.json = {
-            message: "Races updated successfully",
-            result: result
-        };
+        response.json = result;
     }
 
     return response;

@@ -1,29 +1,22 @@
-const express   = require('express');
-const router    = express.Router();
-const dbConn    = require('../../controllers/DatabaseConnector');
-const db        = new dbConn;
-const tableName = 'race';
+const express           = require('express');
+const router            = express.Router();
+const DatabaseHelper    = require('../../middelwares/DatabaseHelpers');
+const dbHelper          = new DatabaseHelper;
 
 router.use(express.json());
 
-router.post('/', (req, res) => {
-    res.status(200);
-    res.json({ data: 'Connection to races success' });
+router.post('/testConn', (req, res) => {
+    res.status(200).json({ data: 'Connection to races success' });
 });
 
 router.post('/createRace', async (req, res) => {
     const jsonData = JSON.parse(req.body);
-    const values = jsonData.values;
 
     try {
-        await db.create(tableName, values, (error, result) => {
-            const response = handleCallback(error, result);
-            res.status(response.status);
-            res.json(response.json);
-        });
+        const response = await dbHelper.create(jsonData, 'race');
+        res.status(response.status).json(response.json);
     } catch (error) {
-        res.status(500);
-        res.json({"Error": error.message});
+        res.status(500).json({ "Error": error.message });
     }
 });
 
@@ -32,8 +25,7 @@ router.post('/getRace', async (req, res) => {
     const id = jsonData.id;
 
     if (id <= 0) {
-        res.status(500);
-        res.json({message: "no data for Id, -1"});
+        res.status(500).json({ "Error": "no data for Id, " + id});
     } else {
         const sql = `
             SELECT
@@ -56,45 +48,61 @@ router.post('/getRace', async (req, res) => {
                                         )
                                     )
                                     FROM racer
-                                    LEFT JOIN user ON racer.user_id = user.id
-                                    WHERE racer.participant_id = participant.id
+                                    INNER JOIN participant_racer pr ON racer.id = pr.racer
+                                    WHERE pr.participant = participant.id
                                 )
                             )
                         )
                         FROM participant
-                        LEFT JOIN participant_type ON participant.type_id = participant_type.id
-                        WHERE participant.race_id = race.id
+                        LEFT JOIN participant_type ON participant.type = participant_type.id
+                        WHERE participant.race = race.id
                     )
                 ) AS result
             FROM race
-            JOIN race_status ON race.status_id = race_status.id
+            INNER JOIN race_status ON race.status = race_status.id
             WHERE race.id = ${id}
-            GROUP BY race.id`;
+            GROUP BY race.id;`;
 
         try {
-            db.query(sql, (error, result) => {
-                const response = handleCallback(error, result);
-                res.status(response.status);
-                res.json(JSON.parse(response.json[0].result));
-            });
+            const result = await dbHelper.query(sql);
+            res.status(result.status).json(JSON.parse(result.json[0].result));
         } catch (error) {
-            res.status(500);
-            res.json({"Error": error.message});
+            res.status(500).json({"Error": error.message});
         }
+    }
+});
+
+router.post('/getRacesList', async (req, res) => {
+    const jsonData = req.body;
+    const conditions = jsonData.conditions;
+    const offset = jsonData.offset;
+    const limit = jsonData.limit;
+    let whereStatement = "";
+
+    if (conditions.length > 0) {
+        whereStatement = `WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}`;
+    }
+
+    const sql = `
+        SELECT race.id, race.name, race.date, race_status.name as status FROM race
+        JOIN race_status ON race.status = race_status.id
+        ${whereStatement}
+        LIMIT ${limit} OFFSET ${offset}`;
+
+    try {
+        const response = await dbHelper.query(sql);
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
     }
 });
 
 router.post('/getRaces', async (req, res) => {
     const jsonData = req.body;
-    const condition = jsonData.condition;
-    const limit = jsonData.limit;
-    const offset = jsonData.offset;
 
     try {
-        await db.select(tableName, condition, limit, offset, (error, result) => {
-            const response = handleCallback(error, result);
-            res.status(response.status).json(response.json);
-        });
+        const response = await dbHelper.selectMulti(jsonData, 'race');
+        res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
     }
@@ -102,49 +110,24 @@ router.post('/getRaces', async (req, res) => {
 
 router.post('/updateRaces', async (req, res) => {
     const jsonData = req.body;
-    const conditions = jsonData.conditions;
-    const values = jsonData.values;
 
     try {
-        await db.update(tableName, values, conditions, (error, result) => {
-            const response = handleCallback(error, result);
-            res.status(response.status);
-            res.json(response.json);
-        });
+        const response = await dbHelper.update(jsonData, 'race');
+        res.status(response.status).json(response.json);
     } catch (error) {
-        res.status(500);
-        res.json({"Error": error.message});
+        res.status(500).json({"Error": error.message});
     }
 });
 
 router.post('/deleteRaces', async (req, res) => {
     const jsonData = req.body;
-    const conditions = jsonData.conditions;
 
     try {
-        await db.delete(tableName, conditions, (error, result) => {
-            const response = handleCallback(error, result);
-            res.status(response.status);
-            res.json(response.json);
-        });
+        const response = await dbHelper.delete(jsonData, 'race');
+        res.status(response.status).json(response.json);
     } catch (error) {
-        res.status(500);
-        res.json({"Error": error.message});
+        res.status(500).json({"Error": error.message});
     }
 });
-
-function handleCallback(error, result) {
-    let response = {};
-
-    if (error) {
-        response.status = 500;
-        response.json = {message: error};
-    } else {
-        response.status = 200;
-        response.json = result;
-    }
-
-    return response;
-}
 
 module.exports = router;

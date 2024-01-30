@@ -29,11 +29,18 @@ class DatabaseConnector {
     }
 
     async selectMulti(table, conditions, limit, offset) {
+        let whereStr = "";
+
+        if (conditions.length > 0) {
+            whereStr = `WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}`;
+        }
+
         const sql = `
         SELECT * FROM ${table}
-        WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}
+        ${whereStr}
         LIMIT ${limit} OFFSET ${offset}`;
 
+        console.log(sql);
         return await this.query(sql);
     }
 
@@ -88,6 +95,8 @@ class DatabaseConnector {
             response.status = 200;
             response.json = result;
         }
+
+        console.log(response);
 
         return response;
     }

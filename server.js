@@ -1,12 +1,13 @@
-const express           = require('express');
-const WebSocket         = require('ws');
-const cors              = require('cors');
-const bodyParser        = require('body-parser');
-const participantRoutes = require('./routes/api/participantRoutes');
-const raceRoutes        = require('./routes/api/raceRoutes');
-const racerRoutes       = require('./routes/api/racerRoutes');
-const userRoutes        = require('./routes/api/userRoutes');
-const app               = express();
+const express                 = require('express');
+const WebSocket               = require('ws');
+const cors                    = require('cors');
+const bodyParser              = require('body-parser');
+const participantRoutes       = require('./routes/api/participantRoutes');
+const participantTypeRoutes   = require('./routes/api/participantTypesRoutes');
+const raceRoutes              = require('./routes/api/raceRoutes');
+const racerRoutes             = require('./routes/api/racerRoutes');
+const userRoutes              = require('./routes/api/userRoutes');
+const app                     = express();
 
 const server = app.listen(8000, () => {
    console.log(`Node.js HTTP server is running on port 8000`);
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/participant', participantRoutes);
+app.use('/participant_type', participantTypeRoutes);
 app.use('/race', raceRoutes);
 app.use('/racer', racerRoutes);
 app.use('/user', userRoutes);

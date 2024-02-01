@@ -21,46 +21,65 @@ class DatabaseConnector {
     }
 
     async select(table, conditions) {
+        let whereStatement = "";
+
+        if (conditions.length > 0) {
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+        }
+
         const sql = `
         SELECT * FROM ${table} 
-        WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}`;
+        ${whereStatement}`;
 
         return await this.query(sql);
     }
 
     async selectMulti(table, conditions, limit, offset) {
-        let whereStr = "";
+        let whereStatement = '';
 
         if (conditions.length > 0) {
-            whereStr = `WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}`;
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
         }
 
         const sql = `
         SELECT * FROM ${table}
-        ${whereStr}
+        ${whereStatement}
         LIMIT ${limit} OFFSET ${offset}`;
 
-        console.log(sql);
         return await this.query(sql);
     }
 
     async update(table, values, conditions) {
+        let whereStatement = "";
+
+        if (conditions.length > 0) {
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+        }
+
         const sql = `UPDATE ${table} 
             SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')} 
-            WHERE ${Object.entries(conditions).map(([key, value]) => `'${value}'`).join(' ')}`;
+            ${whereStatement}`;
 
 
         return await this.query(sql);
     }
 
     async delete(table, conditions) {
+        let whereStatement = "";
+
+        if (conditions.length > 0) {
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+        }
+
         const sql = `DELETE FROM ${table} 
-            WHERE ${Object.entries(conditions).map(([key, value]) => `'${value}'`).join(' ')}`;
+            ${whereStatement}`;
 
         return await this.query(sql);
     }
 
     async query(sql) {
+        console.log(sql);
+
         try {
             const result = await this.fetchData(sql);
             return this.handleResponse(null, result);

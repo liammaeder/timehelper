@@ -12,7 +12,7 @@ class DatabaseHelpers {
     }
 
     async select(jsonData, tableName) {
-        const conditions = jsonData.values;
+        const conditions = jsonData.conditions;
 
         return await db.select(tableName, conditions);
     }

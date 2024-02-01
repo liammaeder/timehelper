@@ -1,8 +1,8 @@
 const express   = require('express');
 const router    = express.Router();
 
-router.get('/', (req, res) => {
-    res.json({ data: 'Connection to users success' });
+router.get('/test', (req, res) => {
+    res.json({ data: 'Connection to participants success' });
 });
 
 router.get('/createParticipant', (req, res) => {

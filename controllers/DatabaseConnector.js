@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const mysql     = require('mysql');
+const {NULL} = require("mysql/lib/protocol/constants/types");
 const dbConfig  = {
     host: process.env.NODE_MYSQL_HOST,
     user: process.env.NODE_MYSQL_USER,
@@ -14,8 +15,30 @@ class DatabaseConnector {
     }
 
     async create(table, values) {
-        const sql = `INSERT INTO ${table}
-            SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')}`;
+        let parameters = [];
+        let columns = [];
+        let columnsStr = "";
+        let parametersStr = "";
+
+        Object.entries(values).map(([key, value]) => {
+            if (value) {
+                columns.push(key);
+                parameters.push(value);
+            }
+        });
+
+        parametersStr = parameters.map((value) => {
+            if (typeof value === "string") {
+                return `'${value}'`;
+            } else {
+                return  value;
+            }
+        }).join(', ');
+
+        columnsStr = columns.join(', ');
+
+        const sql = `INSERT INTO ${table} (${columnsStr}) 
+                     VALUES (${parametersStr})`;
 
         return await this.query(sql);
     }

@@ -13,7 +13,7 @@ router.post('/createRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.create(jsonData, 'race');
+        const response = await dbHelper.create(jsonData, 'racer');
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({ "Error": error.message });
@@ -22,7 +22,6 @@ router.post('/createRacer', async (req, res) => {
 
 router.post('/getRacer', async (req, res) => {
     const jsonData = req.body;
-    console.log(jsonData);
 
     try {
         const response = await dbHelper.select(jsonData, 'racer');

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express                 = require('express');
 const WebSocket               = require('ws');
 const cors                    = require('cors');
@@ -8,9 +9,10 @@ const raceRoutes              = require('./routes/api/raceRoutes');
 const racerRoutes             = require('./routes/api/racerRoutes');
 const userRoutes              = require('./routes/api/userRoutes');
 const app                     = express();
+const port                    = process.env.NODE_PORT;
 
-const server = app.listen(8000, () => {
-   console.log(`Node.js HTTP server is running on port 8000`);
+const server = app.listen(port, () => {
+   console.log(`Node.js HTTP server is running on port ${port}`);
 });
 
 const wss = new WebSocket.Server({ server });

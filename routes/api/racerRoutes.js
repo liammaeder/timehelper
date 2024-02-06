@@ -46,15 +46,22 @@ router.post('/updateRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response =await dbHelper.update(jsonData, 'racer');
+        const response = await dbHelper.update(jsonData, 'racer');
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
     }
 });
 
-router.post('/deleteRacer', (req, res) => {
-    res.json({data: 'Delete Racer successfully connected'});
+router.post('/deleteRacer', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await dbHelper.delete(jsonData, 'racer');
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
+    }
 });
 
 module.exports = router;

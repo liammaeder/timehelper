@@ -25,7 +25,7 @@ router.post('/getEditableRace', async (req, res) => {
 
     try {
         const response = await dbHelper.select(jsonData, 'race');
-        res.status(response.status).json(response.json);
+        res.status(response.status).json(response.json[0]);
     } catch (error) {
         res.status(500).json({"Error": error.message});
     }
@@ -130,7 +130,7 @@ router.post('/getRaces', async (req, res) => {
     }
 });
 
-router.post('/updateRaces', async (req, res) => {
+router.post('/updateRace', async (req, res) => {
     const jsonData = req.body;
 
     try {
@@ -146,7 +146,7 @@ router.post('/deleteRaces', async (req, res) => {
 
     try {
         const response = await dbHelper.delete(jsonData, 'race');
-        res.status(response.status).json(response.json);
+        res.status(response.status).json(response.json[0]);
     } catch (error) {
         res.status(500).json({"Error": error.message});
     }

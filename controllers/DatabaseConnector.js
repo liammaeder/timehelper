@@ -91,7 +91,7 @@ class DatabaseConnector {
         let whereStatement = "";
 
         if (conditions.length > 0) {
-            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(', ')}`;
         }
 
         const sql = `DELETE FROM ${table} 

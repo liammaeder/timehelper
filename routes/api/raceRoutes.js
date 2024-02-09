@@ -10,13 +10,35 @@ router.post('/testConn', (req, res) => {
 });
 
 router.post('/createRace', async (req, res) => {
-    const jsonData = JSON.parse(req.body);
+    const jsonData = req.body;
 
     try {
         const response = await dbHelper.create(jsonData, 'race');
         res.status(response.status).json(response.json);
     } catch (error) {
-        res.status(500).json({ "Error": error.message });
+        res.status(500).json({"Error": error.message});
+    }
+});
+
+router.post('/getEditableRace', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await dbHelper.select(jsonData, 'race');
+        res.status(response.status).json(response.json[0]);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
+    }
+})
+
+router.post('/getRaceParticipants', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await dbHelper.selectMulti(jsonData, 'participant');
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
     }
 });
 
@@ -25,7 +47,7 @@ router.post('/getRace', async (req, res) => {
     const id = jsonData.id;
 
     if (id <= 0) {
-        res.status(500).json({ "Error": "no data for Id, " + id});
+        res.status(500).json({"Error": "no data for Id, " + id});
     } else {
         const sql = `
             SELECT
@@ -108,7 +130,7 @@ router.post('/getRaces', async (req, res) => {
     }
 });
 
-router.post('/updateRaces', async (req, res) => {
+router.post('/updateRace', async (req, res) => {
     const jsonData = req.body;
 
     try {
@@ -124,7 +146,7 @@ router.post('/deleteRaces', async (req, res) => {
 
     try {
         const response = await dbHelper.delete(jsonData, 'race');
-        res.status(response.status).json(response.json);
+        res.status(response.status).json(response.json[0]);
     } catch (error) {
         res.status(500).json({"Error": error.message});
     }

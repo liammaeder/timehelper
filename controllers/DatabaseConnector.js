@@ -29,7 +29,7 @@ class DatabaseConnector {
 
         parametersStr = parameters.map((value) => {
             if (typeof value === "string") {
-                return `'${value}'`;
+                return `"${value}"`;
             } else {
                 return  value;
             }
@@ -47,7 +47,7 @@ class DatabaseConnector {
         let whereStatement = "";
 
         if (conditions.length > 0) {
-            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(" ")}`;
         }
 
         const sql = `
@@ -80,7 +80,7 @@ class DatabaseConnector {
         }
 
         const sql = `UPDATE ${table} 
-            SET ${Object.entries(values).map(([key, value]) => `${key} = '${value}'`).join(', ')} 
+            SET ${Object.entries(values).map(([key, value]) => `${key} = "${value}"`).join(', ')} 
             ${whereStatement}`;
 
 
@@ -91,7 +91,7 @@ class DatabaseConnector {
         let whereStatement = "";
 
         if (conditions.length > 0) {
-            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
+            whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(', ')}`;
         }
 
         const sql = `DELETE FROM ${table} 

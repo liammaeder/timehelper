@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const DatabaseHelper = require('../../middelwares/DatabaseHelpers');
-const dbHelper = new DatabaseHelper;
+const express           = require('express');
+const router            = express.Router();
+const PartCls           = require("../../controllers/Participants");
+const Participants      = new PartCls();
 
 router.use(express.json());
 
@@ -13,7 +13,7 @@ router.post('/createParticipant', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.create(jsonData, 'participant');
+        const response = await Participants.createParticipant(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -24,7 +24,7 @@ router.post('/getParticipant', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.select(jsonData, 'participant');
+        const response = await Participants.getParticipant(jsonData);
         res.status(response.status).json(response.json[0]);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -35,7 +35,7 @@ router.post('/getParticipants', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.selectMulti(jsonData, 'participant');
+        const response = await Participants.getParticipants(jsonData);
         res.status(response.status).json(response.json[0]);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -46,7 +46,7 @@ router.post('/updateParticipant', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.update(jsonData, 'participant');
+        const response = await Participants.updateParticipant(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -57,7 +57,7 @@ router.post('/deleteParticipant', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.delete(jsonData, 'participant');
+        const response = await Participants.deleteParticipants(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});

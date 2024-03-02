@@ -1,7 +1,7 @@
 const express           = require('express');
 const router            = express.Router();
-const DatabaseHelper    = require('../../middelwares/DatabaseHelpers');
-const dbHelper          = new DatabaseHelper;
+const RacersCls         = require('../../controllers/Racers');
+const Racers            = new RacersCls();
 
 router.use(express.json());
 
@@ -13,7 +13,7 @@ router.post('/createRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.create(jsonData, 'racer');
+        const response = await Racers.createRacer(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({ "Error": error.message });
@@ -24,8 +24,8 @@ router.post('/getRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.select(jsonData, 'racer');
-        res.status(response.status).json(response.json[0]);
+        const response = await Racers.getRacer(jsonData);
+        res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({ "Error": error.message });
     }
@@ -35,7 +35,7 @@ router.post('/getRacers', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.selectMulti(jsonData, 'racer');
+        const response = await Racers.getRacers(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -46,7 +46,7 @@ router.post('/updateRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.update(jsonData, 'racer');
+        const response = await Racers.updateRacer(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});
@@ -57,7 +57,7 @@ router.post('/deleteRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
-        const response = await dbHelper.delete(jsonData, 'racer');
+        const response = await Racers.deleteRacer(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});

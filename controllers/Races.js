@@ -22,6 +22,7 @@ class Races {
     }
 
     async getRaceParticipants(jsonData) {
+        
         return await dbHelper.selectMulti(jsonData, this.participantsLink);
     }
 

@@ -42,12 +42,22 @@ router.post('/getParticipants', async (req, res) => {
     }
 });
 
+router.post('/getParticipantLinks', async (req, res) => {
+   const jsonData = req.body;
+
+   try {
+       const response = await Participants.getParticipantLinks(jsonData);
+       res.status(response.status).json(response.json[0]);
+   } catch (error) {
+       res.status(500).message(error.message);
+   }
+});
+
 router.post('/updateParticipant', async (req, res) => {
     const jsonData = req.body;
 
     try {
         const response = await Participants.updateParticipant(jsonData);
-        console.log(response);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});

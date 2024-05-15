@@ -60,7 +60,7 @@ class DatabaseConnector {
     async selectMulti(table, conditions, limit, offset) {
         let whereStatement = '';
 
-        if (conditions.length > 0) {
+        if (typeof conditions !== 'undefined' &&conditions.length > 0) {
             whereStatement = `WHERE ${conditions.map((value) => `${value}`).join(' ')}`;
         }
 

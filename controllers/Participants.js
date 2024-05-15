@@ -29,6 +29,10 @@ class Participants {
         return await dbHelper.update(jsonData, this.tableName);
     }
 
+    async unlinkAllRacers(jsonData) {
+        return await this.deleteParticipantRacers(jsonData.id);
+    }
+
     async deleteParticipants(jsonData) {
         const participantId = jsonData.id;
 

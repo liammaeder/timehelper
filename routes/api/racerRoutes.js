@@ -42,11 +42,33 @@ router.post('/getRacers', async (req, res) => {
     }
 });
 
+router.post('/getRacersNotInRace', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await Racers.getRacersNotInRace(jsonData);
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
+    }
+});
+
 router.post('/updateRacer', async (req, res) => {
     const jsonData = req.body;
 
     try {
         const response = await Racers.updateRacer(jsonData);
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message});
+    }
+});
+
+router.post('/linkRacer', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await Racers.linkRacer(jsonData);
         res.status(response.status).json(response.json);
     } catch (error) {
         res.status(500).json({"Error": error.message});

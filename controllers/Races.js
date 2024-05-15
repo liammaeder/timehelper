@@ -22,7 +22,22 @@ class Races {
     }
 
     async getRaceParticipants(jsonData) {
-        return await dbHelper.selectMulti(jsonData, this.participantsLink);
+        const conditions = jsonData.conditions;
+        let whereStatement = "";
+
+        if (conditions.length > 0) {
+            whereStatement = `WHERE ${Object.entries(conditions).map(([key, value]) => `${value}`).join(' ')}`;
+        }
+
+        const sql = `
+            SELECT participant.id as id, JSON_ARRAYAGG(racer.name) AS racers
+            FROM participant
+            JOIN participant_racer ON participant.id = participant_racer.participant
+            JOIN racer ON racer.id = participant_racer.racer
+            ${whereStatement}
+            GROUP BY participant.id`;
+
+        return await dbHelper.query(sql);
     }
 
     async getRace(jsonData) {

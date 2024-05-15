@@ -21,8 +21,16 @@ class Participants {
         return await dbHelper.selectMulti(jsonData, this.tableName);
     }
 
+    async getParticipantLinks(jsonData) {
+        return await dbHelper.selectMulti(jsonData, this.racerLink);
+    }
+
     async updateParticipant(jsonData) {
         return await dbHelper.update(jsonData, this.tableName);
+    }
+
+    async unlinkAllRacers(jsonData) {
+        return await this.deleteParticipantRacers(jsonData.id);
     }
 
     async deleteParticipants(jsonData) {

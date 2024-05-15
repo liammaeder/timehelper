@@ -75,4 +75,15 @@ router.post('/deleteParticipant', async (req, res) => {
     }
 });
 
+router.post('/unlinkAllRacers', async (req, res) => {
+    const jsonData = req.body;
+
+    try {
+        const response = await Participants.unlinkAllRacers(jsonData);
+        res.status(response.status).json(response.json);
+    } catch (error) {
+        res.status(500).json({"Error": error.message})
+    }
+});
+
 module.exports = router;
